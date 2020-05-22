@@ -1,5 +1,5 @@
 <template>
-    <div class="filters">fd</div>
+    <div class="filters">fgd</div>
 </template>
 
 <script>
@@ -9,8 +9,8 @@
 </script>
 
 
-<style>
+<style scoped>
     .filters {
-        border-top: 1.5px solid #EDEDED;
+        margin-bottom: 1rem;
     }
 </style>
