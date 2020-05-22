@@ -20,6 +20,7 @@
                 <td>651</td>
                 <td>987</td>
                 <td>437</td>
+                <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
             </tr>
             <tr>
                 <td><input type="checkbox"></td>
@@ -29,6 +30,7 @@
                 <td>651</td>
                 <td>987</td>
                 <td>437</td>
+                <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
             </tr>
             <tr>
                 <td><input type="checkbox"></td>
@@ -38,6 +40,7 @@
                 <td>651</td>
                 <td>987</td>
                 <td>437</td>
+                <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
             </tr>
         </tbody>
     </table>
@@ -56,9 +59,15 @@
         background-color: #FFFFFF;
         border-collapse: collapse;
     }
+
+
     tr {
         height: 50px;
         text-align: left;
+    }
+
+    tbody tr:first-child {
+        border-top: 1px solid #EDEDED;
     }
 
     tbody tr:nth-child(even) {
@@ -66,20 +75,48 @@
     }
 
     tbody tr:hover {
-        background-color: rgba(0, 161, 30, 0.07);;
+        background-color: rgba(0, 161, 30, 0.07);
     }
+
 
     th {
         /*width: 140px;*/
         text-align: left;
-        border-bottom: 1px solid #EDEDED;
     }
     th, td {
         font-size: 14px;
         line-height: 24px;
     }
+
+    td:first-child {
+        width: 70px;
+    }
+
+    td:last-child {
+        width: 180px;
+    }
+
+    .delete {
+        display: flex;
+        justify-content: flex-end;
+        margin-right: 2rem;
+    }
+    .delete button {
+        visibility: hidden;
+        display: flex;
+        align-items: center;
+        border: none;
+        color: #5B5E77;
+        background-color: transparent;
+        cursor: pointer;
+    }
+    tbody tr:hover .delete button {
+        visibility: visible;
+    }
+
     input {
         margin-left: 2rem;
+        margin-bottom: 5px;
         vertical-align: middle;
     }
     /*table, th, td {*/

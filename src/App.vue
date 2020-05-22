@@ -26,6 +26,10 @@
         background-color: #F2F2F2;
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
     #app {
         font-family: Source Sans Pro, Avenir, Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
