@@ -24,10 +24,13 @@
 <style>
     body {
         background-color: #F2F2F2;
+
     }
 
     * {
         box-sizing: border-box;
+        font-size: 14px;
+        line-height: 24px;
     }
 
     #app {
@@ -46,6 +49,14 @@
     .container .title {
         padding: 1rem 0;
         margin-bottom: 1rem;
-        border-bottom: 1.5px solid #EDEDED;
+        border-bottom: 2px solid #EDEDED;
+        font-size: 2rem;
+        line-height: 2.5rem;
+    }
+
+    button {
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
     }
 </style>

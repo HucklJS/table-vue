@@ -9,6 +9,7 @@
                 <th>Carbs (g)</th>
                 <th>Protein (g)</th>
                 <th>Iron (%)</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -65,10 +66,13 @@
         height: 50px;
         text-align: left;
     }
-
-    tbody tr:first-child {
-        border-top: 1px solid #EDEDED;
+    thead tr {
+        border-bottom: 1px solid #EDEDED;
     }
+
+    /*tbody tr:first-child {*/
+
+    /*}*/
 
     tbody tr:nth-child(even) {
         background-color: #F8F9FA;
@@ -84,8 +88,7 @@
         text-align: left;
     }
     th, td {
-        font-size: 14px;
-        line-height: 24px;
+
     }
 
     td:first-child {
@@ -105,10 +108,7 @@
         visibility: hidden;
         display: flex;
         align-items: center;
-        border: none;
         color: #5B5E77;
-        background-color: transparent;
-        cursor: pointer;
     }
     tbody tr:hover .delete button {
         visibility: visible;
