@@ -2,7 +2,7 @@
     <div id="app">
         <div class="container">
             <h1 class="title">Table UI</h1>
-            <Loader v-if="loading"/>
+            <Loader v-if="isLoading"/>
             <Error v-else-if="isError"/>
             <template v-else>
                 <FiltersBar></FiltersBar>
@@ -17,6 +17,7 @@
     import Table from './components/Table'
     import Error from "./components/Error"
     import Loader from "./components/Loader"
+    import {getProducts} from './from-server/request'
 
     export default {
         name: 'App',
@@ -28,9 +29,22 @@
         },
         data() {
             return {
+                products: [],
                 isError: false,
-                loading: false
+                isLoading: true
             }
+        },
+        mounted() {
+            getProducts()
+                .then(products => {
+                    this.isLoading = false
+                    this.products = products
+                })
+                .catch(e => {
+                    console.error(e.error)
+                    this.isLoading = false
+                    this.isError = true
+                })
         }
     }
 </script>

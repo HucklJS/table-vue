@@ -85,10 +85,6 @@
         border-bottom: 1px solid #EDEDED;
     }
 
-    /*tbody tr:first-child {*/
-
-    /*}*/
-
     tbody tr:nth-child(even) {
         background-color: #F8F9FA;
     }
@@ -160,7 +156,4 @@
         content: "\2713";
         text-align: center;
     }
-    /*table, th, td {*/
-    /*    border: 1px solid black;*/
-    /*}*/
 </style>
