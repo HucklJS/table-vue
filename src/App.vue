@@ -2,8 +2,11 @@
     <div id="app">
         <div class="container">
             <h1 class="title">Table UI</h1>
-            <FiltersBar></FiltersBar>
-            <Table></Table>
+            <Error v-if="isError"/>
+            <template v-else>
+                <FiltersBar></FiltersBar>
+                <Table></Table>
+            </template>
         </div>
     </div>
 </template>
@@ -11,12 +14,19 @@
 <script>
     import FiltersBar from './components/FiltersBar.vue'
     import Table from './components/Table'
+    import Error from "./components/Error"
 
     export default {
         name: 'App',
         components: {
             FiltersBar,
-            Table
+            Table,
+            Error
+        },
+        data() {
+            return {
+                isError: false
+            }
         }
     }
 </script>

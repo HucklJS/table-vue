@@ -120,6 +120,7 @@
     }
 
     .other-elements button.left-arrow {
+        margin-left: 0;
         background: transparent url("../assets/svg/Left.svg") no-repeat center;
     }
 
