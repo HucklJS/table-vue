@@ -2,7 +2,8 @@
     <div id="app">
         <div class="container">
             <h1 class="title">Table UI</h1>
-            <Error v-if="isError"/>
+            <Loader v-if="loading"/>
+            <Error v-else-if="isError"/>
             <template v-else>
                 <FiltersBar></FiltersBar>
                 <Table></Table>
@@ -15,17 +16,20 @@
     import FiltersBar from './components/FiltersBar.vue'
     import Table from './components/Table'
     import Error from "./components/Error"
+    import Loader from "./components/Loader"
 
     export default {
         name: 'App',
         components: {
             FiltersBar,
             Table,
-            Error
+            Error,
+            Loader
         },
         data() {
             return {
-                isError: false
+                isError: false,
+                loading: false
             }
         }
     }

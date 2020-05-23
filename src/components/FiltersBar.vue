@@ -86,7 +86,7 @@
         bottom: -1px;
         background-color: #F2F2F2;
         opacity: .6;
-        cursor: default;
+        cursor: default !important;
     }
 
     .other-elements select,
