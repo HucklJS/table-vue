@@ -14,7 +14,12 @@
         </thead>
         <tbody>
             <tr>
-                <td><input type="checkbox"></td>
+                <td>
+                    <div class="checkbox">
+                        <input id="checkbox1" type="checkbox">
+                        <label for="checkbox1"></label>
+                    </div>
+                </td>
                 <td>Frozen Yogurt</td>
                 <td>125</td>
                 <td>342</td>
@@ -24,7 +29,12 @@
                 <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
             </tr>
             <tr>
-                <td><input type="checkbox"></td>
+                <td>
+                    <div class="checkbox">
+                        <input id="checkbox2" type="checkbox">
+                        <label for="checkbox2"></label>
+                    </div>
+                </td>
                 <td>Frozen Yogurt</td>
                 <td>125</td>
                 <td>342</td>
@@ -34,7 +44,12 @@
                 <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
             </tr>
             <tr>
-                <td><input type="checkbox"></td>
+                <td>
+                    <div class="checkbox">
+                         <input id="checkbox3" type="checkbox">
+                        <label for="checkbox3"></label>
+                    </div>
+                </td>
                 <td>Frozen Yogurt</td>
                 <td>125</td>
                 <td>342</td>
@@ -114,10 +129,35 @@
         visibility: visible;
     }
 
-    input {
+    .checkbox {
+        /*padding-right: 5px;*/
+    }
+    input[type="checkbox"] {
+        position:absolute;
+        left:-9999px;
+    }
+    label {
+        display: block;
         margin-left: 2rem;
-        margin-bottom: 5px;
+        cursor: pointer;
+    }
+    input[type="checkbox"] + label:before {
+        content: "\00a0";
+        display: inline-block;
+        height: 1rem;
+        width: 1rem;
+        margin: 0 .25em 4px 0;
+        padding: 0;
+        border: 1px solid #C6CBD4;
+        border-radius: 1px;
+        line-height: 1.1rem;
         vertical-align: middle;
+    }
+    input[type="checkbox"]:checked + label:before {
+        background: #00A11E;
+        color: #fff;
+        content: "\2713";
+        text-align: center;
     }
     /*table, th, td {*/
     /*    border: 1px solid black;*/
