@@ -6,9 +6,11 @@
             <Error v-else-if="isError"/>
             <template v-else>
                 <FiltersBar
-                        :selectedProductsPerPage="selectedProductsPerPage"
-                        @changeSelectedProductsPerPage="changeSelectedProductsPerPage"
+                        :selected-products-per-page="selectedProductsPerPage"
+                        @change-selected-products-per-page="changeSelectedProductsPerPage"
                         :products-amount="productsAmount"
+                        :products-start-from="productsStartFrom"
+                        :products-end-to="productsEndTo"
                 />
                 <Table
                         :filtered-products="productsOnPage"
@@ -39,6 +41,7 @@
                 isError: false,
                 isLoading: true,
                 selectedProductsPerPage: '5',
+                currentPage: 0
             }
         },
         computed: {
@@ -47,6 +50,12 @@
             },
             productsAmount() {
                 return this.products.length
+            },
+            productsStartFrom() {
+                return this.currentPage * this.selectedProductsPerPage + 1
+            },
+            productsEndTo() {
+                return (this.currentPage  + 1) * this.selectedProductsPerPage
             }
         },
         methods: {

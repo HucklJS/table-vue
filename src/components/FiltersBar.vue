@@ -15,14 +15,14 @@
                     name="per-page"
                     id="per-page"
                     :value="selectedProductsPerPage"
-                    @input="$emit('changeSelectedProductsPerPage', $event.target.value)"
+                    @input="$emit('change-selected-products-per-page', $event.target.value)"
             >
                 <option value="5">5 Per Page</option>
                 <option value="10">10 Per Page</option>
                 <option value="15">15 Per Page</option>
             </select>
             <button class="nav-arrow left-arrow" disabled></button>
-            <span>1-{{selectedProductsPerPage}} of {{productsAmount}}</span>
+            <span>{{productsStartFrom}}-{{productsEndTo}} of {{productsAmount}}</span>
             <button class="nav-arrow right-arrow" ></button>
 <!--            <select name="columns" id="choose-columns">-->
 <!--                <option value="6">6 columns selected</option>-->
@@ -40,6 +40,12 @@
                 required: true
             },
             productsAmount: {
+                type: Number
+            },
+            productsStartFrom: {
+                type: Number
+            },
+            productsEndTo: {
                 type: Number
             }
         }
