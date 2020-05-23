@@ -54,9 +54,14 @@
         line-height: 2.5rem;
     }
 
-    button {
+    button, select {
         border: none;
+        outline: none;
         background-color: transparent;
         cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        color: #00A11E;
     }
 </style>
