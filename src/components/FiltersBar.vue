@@ -11,13 +11,18 @@
         </div>
         <div class="other-elements">
             <button class="delete" disabled>Delete</button>
-            <select name="per-page" id="per-page">
+            <select
+                    name="per-page"
+                    id="per-page"
+                    :value="selectedProductsPerPage"
+                    @input="$emit('changeSelectedProductsPerPage', $event.target.value)"
+            >
                 <option value="5">5 Per Page</option>
                 <option value="10">10 Per Page</option>
                 <option value="15">15 Per Page</option>
             </select>
             <button class="nav-arrow left-arrow" disabled></button>
-            <span>1-10 of 25</span>
+            <span>1-{{selectedProductsPerPage}} of {{productsAmount}}</span>
             <button class="nav-arrow right-arrow" ></button>
 <!--            <select name="columns" id="choose-columns">-->
 <!--                <option value="6">6 columns selected</option>-->
@@ -29,7 +34,15 @@
 
 <script>
     export default {
-        // name: FiltersBar
+        props: {
+            selectedProductsPerPage: {
+                type: String,
+                required: true
+            },
+            productsAmount: {
+                type: Number
+            }
+        }
     }
 </script>
 

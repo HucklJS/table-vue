@@ -13,50 +13,30 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            <tr
+                v-for="product in filteredProducts"
+                :key="product.id"
+            >
                 <td>
                     <div class="checkbox">
-                        <input id="checkbox1" type="checkbox">
-                        <label for="checkbox1"></label>
+                        <label>
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                        </label>
                     </div>
                 </td>
-                <td>Frozen Yogurt</td>
-                <td>125</td>
-                <td>342</td>
-                <td>651</td>
-                <td>987</td>
-                <td>437</td>
-                <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
-            </tr>
-            <tr>
+                <td>{{product['pro' + 'duct']}}</td>
+                <td>{{product.calories}}</td>
+                <td>{{product.fat}}</td>
+                <td>{{product.carbs}}</td>
+                <td>{{product.protein}}</td>
+                <td>{{product.iron}}</td>
                 <td>
-                    <div class="checkbox">
-                        <input id="checkbox2" type="checkbox">
-                        <label for="checkbox2"></label>
-                    </div>
-                </td>
-                <td>Frozen Yogurt</td>
-                <td>125</td>
-                <td>342</td>
-                <td>651</td>
-                <td>987</td>
-                <td>437</td>
-                <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="checkbox">
-                         <input id="checkbox3" type="checkbox">
-                        <label for="checkbox3"></label>
-                    </div>
-                </td>
-                <td>Frozen Yogurt</td>
-                <td>125</td>
-                <td>342</td>
-                <td>651</td>
-                <td>987</td>
-                <td>437</td>
-                <td><div class="delete"><button><img src="../assets/svg/Group.svg" alt="cart">delete</button></div></td>
+                    <div class="delete">
+                        <button>
+                            <img src="../assets/svg/Group.svg" alt="cart">delete
+                        </button>
+                    </div></td>
             </tr>
         </tbody>
     </table>
@@ -64,7 +44,12 @@
 
 <script>
     export default {
-        // name: FiltersBar
+        props: {
+            filteredProducts: {
+                type: Array,
+                required: true
+            }
+        }
     }
 </script>
 
@@ -125,9 +110,7 @@
         visibility: visible;
     }
 
-    .checkbox {
-        /*padding-right: 5px;*/
-    }
+
     input[type="checkbox"] {
         position:absolute;
         left:-9999px;
@@ -137,7 +120,7 @@
         margin-left: 2rem;
         cursor: pointer;
     }
-    input[type="checkbox"] + label:before {
+    input[type="checkbox"] + .checkmark:before {
         content: "\00a0";
         display: inline-block;
         height: 1rem;
@@ -149,7 +132,7 @@
         line-height: 1.1rem;
         vertical-align: middle;
     }
-    input[type="checkbox"]:checked + label:before {
+    input[type="checkbox"]:checked + .checkmark:before {
         background: #00A11E;
         border: 1px solid #00A11E;
         color: #fff;

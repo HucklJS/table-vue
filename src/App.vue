@@ -5,8 +5,14 @@
             <Loader v-if="isLoading"/>
             <Error v-else-if="isError"/>
             <template v-else>
-                <FiltersBar></FiltersBar>
-                <Table></Table>
+                <FiltersBar
+                        :selectedProductsPerPage="selectedProductsPerPage"
+                        @changeSelectedProductsPerPage="changeSelectedProductsPerPage"
+                        :products-amount="productsAmount"
+                />
+                <Table
+                        :filtered-products="productsOnPage"
+                />
             </template>
         </div>
     </div>
@@ -31,9 +37,28 @@
             return {
                 products: [],
                 isError: false,
-                isLoading: true
+                isLoading: true,
+                selectedProductsPerPage: '5',
             }
         },
+        computed: {
+            productsOnPage() {
+                return this.products.slice(0, this.selectedProductsPerPage)
+            },
+            productsAmount() {
+                return this.products.length
+            }
+        },
+        methods: {
+            changeSelectedProductsPerPage(value) {
+                this.selectedProductsPerPage = value
+            }
+        },
+        // watch: {
+        //     selectedProductsPerPage() {
+        //         console.log(this.selectedProductsPerPage)
+        //     }
+        // },
         mounted() {
             getProducts()
                 .then(products => {
