@@ -10,19 +10,19 @@
             <button >Iron (%)</button>
         </div>
         <div class="other-elements">
-            <button class="delete">Delete</button>
+            <button class="delete" disabled>Delete</button>
             <select name="per-page" id="per-page">
                 <option value="5">5 Per Page</option>
                 <option value="10">10 Per Page</option>
                 <option value="15">15 Per Page</option>
             </select>
-<!--            не получилость вставить картину вместо знаков больше и меньше-->
-            <button class="nav-arrow left-arrow"></button>
+            <button class="nav-arrow left-arrow" disabled></button>
             <span>1-10 of 25</span>
-            <button class="nav-arrow right-arrow"></button>
-            <select name="columns" id="choose-columns">
-                <option value="6">6 columns selected</option>
-            </select>
+            <button class="nav-arrow right-arrow" ></button>
+<!--            <select name="columns" id="choose-columns">-->
+<!--                <option value="6">6 columns selected</option>-->
+<!--            </select>-->
+            <button class="choose-columns">6 columns selected</button>
         </div>
     </div>
 </template>
@@ -43,64 +43,88 @@
     }
 
 
-    .sorting-btns, .other-elements{
+    .sorting-btns,
+    .other-elements{
         display: flex;
         align-items: center;
     }
 
-    .sorting-btns button, .other-elements button, .other-elements select {
+    .sorting-btns button,
+    .other-elements button,
+    .other-elements select {
         height: 100%;
+        border-radius: 2px;
     }
 
     .sorting-btns button.active {
         padding: 3px 6px;
         margin-left: .5rem;
-        border-radius: 2px;
         background-color: #00A11E;
         color: #FFFFFF;
+    }
+
+    .other-elements button {
+        border: 1px solid #D5DAE0;
     }
 
     .other-elements button.delete {
         padding: 2px 12px;
         margin-right: 16px;
         border: 1px solid #C6CBD4;
-        border-radius: 2px;
         color: #5B5E77;
     }
-    .other-elements select {
-        appearance: none;
-        padding: 4px 25px 4.5px 10px;
-        margin-right: 16px;
-        border: 1px solid #C6CBD4;
-        border-radius: 2px;
-        color: #5B5E77;
+
+    :disabled {
+        position: relative;
+    }
+    :disabled:before {
+        content: '';
+        position: absolute;
+        left: -1px;
+        right: -1px;
+        top: -1px;
+        bottom: -1px;
+        background-color: #F2F2F2;
+        opacity: .6;
+        cursor: default;
+    }
+
+    .other-elements select,
+    button.choose-columns {
+        padding: 4px 27px 4.5px 10px;
         background: transparent url("../assets/svg/Down-arrow.svg") no-repeat right;
         background-position-x: calc(100% - 10px);
+        background-position-y: calc(100% - 11.3px);
+    }
+
+    .other-elements select {
+        appearance: none;
+        margin-right: 16px;
+        border: 1px solid #C6CBD4;
+        color: #5B5E77;
     }
 
     .other-elements select::-ms-expand{
         display: none;
     }
 
-    .other-elements select#choose-columns {
-        margin-right: 0;
-    }
+    /*.other-elements select#choose-columns {*/
+    /*    margin-right: 0;*/
+    /*}*/
 
     .other-elements button.nav-arrow {
+        width: 32px;
         padding: 2px 12px;
         margin: 0 8px;
         border: 1px solid #D5DAE0;
-        border-radius: 2px;
     }
+
     .other-elements button.left-arrow {
-        width: 32px;
         background: transparent url("../assets/svg/Left.svg") no-repeat center;
-        background-size: cover;
     }
+
     .other-elements button.right-arrow {
-        width: 32px;
         margin-right: 16px;
         background: transparent url("../assets/svg/Right.svg") no-repeat center;
-        background-size: cover;
     }
 </style>

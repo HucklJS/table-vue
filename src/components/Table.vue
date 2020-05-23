@@ -155,6 +155,7 @@
     }
     input[type="checkbox"]:checked + label:before {
         background: #00A11E;
+        border: 1px solid #00A11E;
         color: #fff;
         content: "\2713";
         text-align: center;
