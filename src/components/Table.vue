@@ -3,12 +3,12 @@
         <thead>
             <tr>
                 <th><input type="checkbox" hidden></th>
-                <th>Product (100g serving)</th>
-                <th>Calories</th>
-                <th>Fat (g)</th>
-                <th>Carbs (g)</th>
-                <th>Protein (g)</th>
-                <th>Iron (%)</th>
+                <th
+                        v-for="productProp in productProps"
+                        :key="productProp.id"
+                >
+                    {{productProp.value}}
+                </th>
                 <th></th>
             </tr>
         </thead>
@@ -25,18 +25,25 @@
                         </label>
                     </div>
                 </td>
-                <td>{{product['pro' + 'duct']}}</td>
-                <td>{{product.calories}}</td>
-                <td>{{product.fat}}</td>
-                <td>{{product.carbs}}</td>
-                <td>{{product.protein}}</td>
-                <td>{{product.iron}}</td>
+<!--                <td>{{product['pro' + 'duct']}}</td>-->
+<!--                <td>{{product.calories}}</td>-->
+<!--                <td>{{product.fat}}</td>-->
+<!--                <td>{{product.carbs}}</td>-->
+<!--                <td>{{product.protein}}</td>-->
+<!--                <td>{{product.iron}}</td>-->
+                <td
+                        v-for="productProp in productProps"
+                        :key="productProp.id"
+                >
+                    {{product[productProp.name]}}
+                </td>
                 <td>
                     <div class="delete">
                         <button>
                             <img src="../assets/svg/Group.svg" alt="cart">delete
                         </button>
-                    </div></td>
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -45,6 +52,10 @@
 <script>
     export default {
         props: {
+            productProps: {
+                type: Array,
+                required: true
+            },
             filteredProducts: {
                 type: Array,
                 required: true

@@ -1,14 +1,17 @@
 <template>
     <div class="filters">
-        <div class="sorting-btns">
+        <div class="sorting-btns" @click="$emit('choose-first-column', $event)">
             <span>Sorting by:</span>
-            <button class="active">Product (100g serving)</button>
-            <button >Calories</button>
-            <button >Fat (g)</button>
-            <button >Carbs (g)</button>
-            <button >Protein (g)</button>
-            <button >Iron (%)</button>
+            <button
+                    v-for="productProp in productProps"
+                    :key="productProp.id"
+                    :class="{active: productProp.isActive}"
+                    :data-prop-name="productProp.name"
+            >
+                {{productProp.value}}
+            </button>
         </div>
+
         <div class="other-elements">
             <button class="delete" disabled>Delete</button>
             <select
@@ -17,9 +20,9 @@
                     :value="selectedProductsPerPage"
                     @input="$emit('on-change-selected-products-per-page', $event.target.value)"
             >
-                <option value="5">5 Per Page</option>
                 <option value="10">10 Per Page</option>
                 <option value="15">15 Per Page</option>
+                <option value="20">20 Per Page</option>
             </select>
             <button
                     class="nav-arrow left-arrow"
@@ -43,6 +46,10 @@
 <script>
     export default {
         props: {
+            productProps: {
+              type: Array,
+              required: true
+            },
             selectedProductsPerPage: {
                 type: String,
                 required: true

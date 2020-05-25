@@ -6,6 +6,9 @@
             <Error v-else-if="isError"/>
             <template v-else>
                 <FiltersBar
+                        :product-props="productProps"
+                        @choose-first-column="chooseFirstColumn"
+
                         :selected-products-per-page="selectedProductsPerPage"
                         @on-change-selected-products-per-page="onChangeSelectedProductsPerPage"
 
@@ -16,6 +19,7 @@
                         @change-current-page="changeCurrentPage"
                 />
                 <Table
+                        :product-props="productProps"
                         :filtered-products="productsOnPage"
                 />
             </template>
@@ -41,16 +45,28 @@
         data() {
             return {
                 products: [],
+                productProps: [
+                    {name: 'product', value: 'Product (100g serving)', isActive: true, id: 1},
+                    {name: 'calories', value: 'Calories', isActive: false, id: 2},
+                    {name: 'fat', value: 'Fat (g)', isActive: false, id: 3},
+                    {name: 'carbs', value: 'Carbs (g)', isActive: false, id: 4},
+                    {name: 'protein', value: 'Protein (g)', isActive: false, id: 5},
+                    {name: 'iron', value: 'Iron (%)', isActive: false, id: 6}
+                ],
+                columns: ['product', 'calories', 'fat', 'carbs', 'protein', 'iron'],
                 isError: false,
                 isLoading: true,
-                selectedProductsPerPage: '5',
+                selectedProductsPerPage: '10',
                 currentPage: 0
             }
         },
         computed: {
             productsOnPage() {
                 const correction = this.currentPage * this.selectedProductsPerPage
-                return this.products.slice(correction, Number(this.selectedProductsPerPage) + correction)
+                return this.products.slice(
+                    correction,
+                    Number(this.selectedProductsPerPage) + correction
+                )
             },
             productsStartFrom() {
                 return this.currentPage * this.selectedProductsPerPage + 1
@@ -59,12 +75,34 @@
                 const productsAmount = this.products.length
                 const possibleValue = (this.currentPage  + 1) * this.selectedProductsPerPage
 
-                return (!productsAmount || productsAmount > possibleValue)
+                return (productsAmount > possibleValue)
                     ? possibleValue
                     : productsAmount
             }
         },
         methods: {
+            chooseFirstColumn(e) {
+                const target = e.target.closest('button')
+                if (!target) return
+
+                const productProps = this.productProps
+                // sort to save order
+                productProps.sort((a, b) => a.id - b.id)
+                // find index of choosen prop
+                const propIndex = productProps.findIndex(
+                    prop => prop.name === target.dataset.propName
+                )
+                // change active condition
+                productProps.forEach((prop, i) => {
+                    prop.isActive = i === propIndex
+                })
+                // make new array with new first prop
+                this.productProps = [
+                    productProps[propIndex],
+                    ...productProps.slice(0, propIndex),
+                    ...productProps.slice(propIndex + 1)
+                ]
+            },
             onChangeSelectedProductsPerPage(value) {
                 this._changeSelectedProductsPerPage(value)
                 this.changeCurrentPage('reset')
