@@ -7,10 +7,13 @@
             <template v-else>
                 <FiltersBar
                         :selected-products-per-page="selectedProductsPerPage"
-                        @change-selected-products-per-page="changeSelectedProductsPerPage"
-                        :products-amount="productsAmount"
+                        @on-change-selected-products-per-page="onChangeSelectedProductsPerPage"
+
+                        :products-amount="products.length"
                         :products-start-from="productsStartFrom"
                         :products-end-to="productsEndTo"
+
+                        @change-current-page="changeCurrentPage"
                 />
                 <Table
                         :filtered-products="productsOnPage"
@@ -46,21 +49,41 @@
         },
         computed: {
             productsOnPage() {
-                return this.products.slice(0, this.selectedProductsPerPage)
-            },
-            productsAmount() {
-                return this.products.length
+                const correction = this.currentPage * this.selectedProductsPerPage
+                return this.products.slice(correction, Number(this.selectedProductsPerPage) + correction)
             },
             productsStartFrom() {
                 return this.currentPage * this.selectedProductsPerPage + 1
             },
             productsEndTo() {
-                return (this.currentPage  + 1) * this.selectedProductsPerPage
+                const productsAmount = this.products.length
+                const possibleValue = (this.currentPage  + 1) * this.selectedProductsPerPage
+
+                return (!productsAmount || productsAmount > possibleValue)
+                    ? possibleValue
+                    : productsAmount
             }
         },
         methods: {
-            changeSelectedProductsPerPage(value) {
+            onChangeSelectedProductsPerPage(value) {
+                this._changeSelectedProductsPerPage(value)
+                this.changeCurrentPage('reset')
+            },
+            _changeSelectedProductsPerPage(value) {
                 this.selectedProductsPerPage = value
+            },
+            changeCurrentPage(direction) {
+                switch (direction) {
+                    case 'forward':
+                        this.currentPage++
+                        break
+                    case 'back':
+                        this.currentPage--
+                        break
+                    case 'reset':
+                        this.currentPage = 0
+                        break
+                }
             }
         },
         // watch: {
