@@ -95,6 +95,7 @@
         margin-left: .5rem;
         background-color: #00A11E;
         color: #FFFFFF;
+        cursor: default;
     }
 
     .other-elements button {
@@ -126,7 +127,7 @@
     .other-elements select,
     button.choose-columns {
         padding: 4px 27px 4.5px 10px;
-        background: transparent url("../assets/svg/Down-arrow.svg") no-repeat right;
+        background: transparent url("../assets/svg/Select-arrow.svg") no-repeat right;
         background-position-x: calc(100% - 10px);
         background-position-y: calc(100% - 11.3px);
     }

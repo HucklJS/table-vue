@@ -1,13 +1,17 @@
 <template>
     <table>
         <thead>
-            <tr>
+            <tr @click="$emit('change-sort-order', $event)">
                 <th><input type="checkbox" hidden></th>
                 <th
                         v-for="productProp in productProps"
                         :key="productProp.id"
                 >
-                    {{productProp.value}}
+                    <span
+                            :class="[productProp.isActive && 'active ' + sortOrder]"
+                    >
+                        {{productProp.value}}
+                    </span>
                 </th>
                 <th></th>
             </tr>
@@ -56,6 +60,7 @@
                 type: Array,
                 required: true
             },
+            sortOrder: String,
             filteredProducts: {
                 type: Array,
                 required: true
@@ -93,6 +98,22 @@
     th {
         /*width: 140px;*/
         text-align: left;
+    }
+    .active {
+        cursor: pointer;
+    }
+    .active.high-low:after, .active.low-high:after{
+        content: '';
+        display: inline-block;
+        vertical-align: bottom;
+        width: 24px;
+        height: 24px;
+    }
+    .active.high-low:after {
+        background: transparent url("../assets/svg/down-arrow.svg") no-repeat right;
+    }
+    .active.low-high:after {
+        background: transparent url("../assets/svg/up-arrow.svg") no-repeat right;
     }
     th, td {
 

@@ -19,6 +19,8 @@
                         @change-current-page="changeCurrentPage"
                 />
                 <Table
+                        @change-sort-order="changeSortOrder"
+                        :sort-order="sortOrder"
                         :product-props="productProps"
                         :filtered-products="productsOnPage"
                 />
@@ -53,20 +55,22 @@
                     {name: 'protein', value: 'Protein (g)', isActive: false, id: 5},
                     {name: 'iron', value: 'Iron (%)', isActive: false, id: 6}
                 ],
-                columns: ['product', 'calories', 'fat', 'carbs', 'protein', 'iron'],
+                activeProductProp: 'product',
                 isError: false,
                 isLoading: true,
                 selectedProductsPerPage: '10',
-                currentPage: 0
+                currentPage: 0,
+                sortOrder: 'high-low',
             }
         },
         computed: {
             productsOnPage() {
                 const correction = this.currentPage * this.selectedProductsPerPage
-                return this.products.slice(
-                    correction,
-                    Number(this.selectedProductsPerPage) + correction
-                )
+                return this.products
+                    .slice(
+                        correction,
+                        Number(this.selectedProductsPerPage) + correction
+                    )
             },
             productsStartFrom() {
                 return this.currentPage * this.selectedProductsPerPage + 1
@@ -102,6 +106,12 @@
                     ...productProps.slice(0, propIndex),
                     ...productProps.slice(propIndex + 1)
                 ]
+                // to show which prop is first
+                this.activeProductProp = productProps[propIndex].name
+                // sort
+                this.products.sort(this.sortBy(this.sortOrder))
+                // reset current page
+                this.changeCurrentPage('reset')
             },
             onChangeSelectedProductsPerPage(value) {
                 this._changeSelectedProductsPerPage(value)
@@ -122,8 +132,32 @@
                         this.currentPage = 0
                         break
                 }
-            }
+            },
+            changeSortOrder(e) {
+                const target = e.target.closest('.active')
+                if (!target) return
+
+                const order = this.sortOrder === 'high-low' ? 'low-high': 'high-low'
+                this.sortOrder = order
+                this.products.sort(this.sortBy(order))
+                this.changeCurrentPage('reset')
+            },
+            sortBy(order) {
+                switch (order) {
+                    case 'high-low':
+                        return this._sortByHighFn()
+                    case 'low-high':
+                        return this._sortByLowFn()
+                }
+            },
+            _sortByLowFn() {
+                return (a, b) => a[this.activeProductProp] > b[this.activeProductProp] ? 1 : -1
+            },
+            _sortByHighFn() {
+                return (a, b) => a[this.activeProductProp] < b[this.activeProductProp] ? 1 : -1
+            },
         },
+
         // watch: {
         //     selectedProductsPerPage() {
         //         console.log(this.selectedProductsPerPage)
@@ -133,7 +167,8 @@
             getProducts()
                 .then(products => {
                     this.isLoading = false
-                    this.products = products
+                    // sort before creating table
+                    this.products = products.sort(this.sortBy(this.sortOrder))
                 })
                 .catch(e => {
                     console.error(e.error)
