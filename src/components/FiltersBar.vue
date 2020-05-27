@@ -5,8 +5,9 @@
             <button
                     v-for="productProp in productProps"
                     :key="productProp.id"
-                    :class="{active: productProp.isActive}"
+                    :class="{active: productProp.name === activeProductProp}"
                     :data-prop-name="productProp.name"
+                    :disabled="excludedProductProps.includes(productProp.name)"
             >
                 {{productProp.value}}
             </button>
@@ -38,8 +39,47 @@
 <!--            <select name="columns" id="choose-columns">-->
 <!--                <option value="6">6 columns selected</option>-->
 <!--            </select>-->
-            <button class="choose-columns">6 columns selected</button>
+            <div class="choose-columns-wrap">
+                <button
+                        class="choose-columns"
+                        @click="$emit('toggle-select-expanded-visible')"
+                >
+                    6 columns selected
+                </button>
+
+                <div class="select-expanded" v-show="isSelectExpandedVisible">
+                    <div class="checkbox" >
+                        <label>
+                            <input
+                                    type="checkbox"
+                                    :checked="isAllProductPropsSelected"
+                                    @change="$emit('toggle-all-product-props-selected')"
+                            >
+                            <span class="checkmark"></span>
+                            Select All
+                        </label>
+                    </div>
+                    <div
+                            v-for="productProp in productProps"
+                            :key="productProp.id"
+                            class="checkbox"
+                    >
+                        <label>
+                            <input type="checkbox"
+                                   :checked="!excludedProductProps.includes(productProp.name)"
+                                   :value="productProp.name"
+                                   @change="$emit('toggle-exclude-product-props' , $event)"
+                            >
+                            <span class="checkmark"></span>
+                            {{productProp.name}}
+                        </label>
+                    </div>
+                </div>
+                <!--    .select-expanded            -->
+            </div>
+            <!--    .choose-columns-wrap            -->
         </div>
+
     </div>
 </template>
 
@@ -49,6 +89,9 @@
             productProps: {
               type: Array,
               required: true
+            },
+            activeProductProp: {
+                type: String
             },
             selectedProductsPerPage: {
                 type: String,
@@ -62,7 +105,19 @@
             },
             productsEndTo: {
                 type: Number
+            },
+            isSelectExpandedVisible: {
+                type: Boolean
+            },
+            excludedProductProps: {
+                type: Array
+            },
+            isAllProductPropsSelected: {
+                type: Boolean
             }
+        },
+        methods: {
+
         }
     }
 </script>
@@ -81,6 +136,11 @@
     .other-elements{
         display: flex;
         align-items: center;
+    }
+
+    .choose-columns-wrap {
+        position: relative;
+        height: 100%;
     }
 
     .sorting-btns button,
@@ -162,5 +222,25 @@
     .other-elements button.right-arrow {
         margin-right: 16px;
         background: transparent url("../assets/svg/Right.svg") no-repeat center;
+    }
+
+    .select-expanded {
+        position: absolute;
+        top: 50px;
+        left: 1px;
+        height: 243px;
+        width: 207px;
+        padding: 0 20px;
+        overflow: auto;
+        background: #FFFFFF;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.16);
+        border-radius: 4px;
+    }
+
+    .checkbox {
+        margin: 12px 0;
+    }
+    .checkmark {
+        margin-top: 2px;
     }
 </style>

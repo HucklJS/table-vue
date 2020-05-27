@@ -4,11 +4,11 @@
             <tr @click="$emit('change-sort-order', $event)">
                 <th><input type="checkbox" hidden></th>
                 <th
-                        v-for="productProp in productProps"
+                        v-for="productProp in filteredAndSortedProductProps"
                         :key="productProp.id"
                 >
                     <span
-                            :class="[productProp.isActive && 'active ' + sortOrder]"
+                            :class="[{'active': productProp.name === activeProductProp}, sortOrder]"
                     >
                         {{productProp.value}}
                     </span>
@@ -29,14 +29,8 @@
                         </label>
                     </div>
                 </td>
-<!--                <td>{{product['pro' + 'duct']}}</td>-->
-<!--                <td>{{product.calories}}</td>-->
-<!--                <td>{{product.fat}}</td>-->
-<!--                <td>{{product.carbs}}</td>-->
-<!--                <td>{{product.protein}}</td>-->
-<!--                <td>{{product.iron}}</td>-->
                 <td
-                        v-for="productProp in productProps"
+                        v-for="productProp in filteredAndSortedProductProps"
                         :key="productProp.id"
                 >
                     {{product[productProp.name]}}
@@ -56,14 +50,16 @@
 <script>
     export default {
         props: {
-            productProps: {
-                type: Array,
-                required: true
+            activeProductProp: {
+                type: String
             },
             sortOrder: String,
             filteredProducts: {
                 type: Array,
                 required: true
+            },
+            filteredAndSortedProductProps: {
+                type: Array
             }
         }
     }
@@ -142,33 +138,7 @@
         visibility: visible;
     }
 
-
-    input[type="checkbox"] {
-        position:absolute;
-        left:-9999px;
-    }
     label {
-        display: block;
         margin-left: 2rem;
-        cursor: pointer;
-    }
-    input[type="checkbox"] + .checkmark:before {
-        content: "\00a0";
-        display: inline-block;
-        height: 1rem;
-        width: 1rem;
-        margin: 0 .25em 4px 0;
-        padding: 0;
-        border: 1px solid #C6CBD4;
-        border-radius: 1px;
-        line-height: 1.1rem;
-        vertical-align: middle;
-    }
-    input[type="checkbox"]:checked + .checkmark:before {
-        background: #00A11E;
-        border: 1px solid #00A11E;
-        color: #fff;
-        content: "\2713";
-        text-align: center;
     }
 </style>

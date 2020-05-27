@@ -8,21 +8,31 @@
                 <FiltersBar
                         :product-props="productProps"
                         @choose-first-column="chooseFirstColumn"
+                        :active-product-prop="activeProductProp"
 
-                        :selected-products-per-page="selectedProductsPerPage"
-                        @on-change-selected-products-per-page="onChangeSelectedProductsPerPage"
+                        :selected-products-per-page="productsPerPage"
+                        @on-change-selected-products-per-page="onChangeProductsPerPage"
 
                         :products-amount="products.length"
                         :products-start-from="productsStartFrom"
                         :products-end-to="productsEndTo"
 
                         @change-current-page="changeCurrentPage"
+
+                        :is-select-expanded-visible="isSelectExpandedVisible"
+                        @toggle-select-expanded-visible="toggleSelectExpandedVisible"
+                        :excluded-product-props="excludedProductProps"
+                        :is-all-product-props-selected="isAllProductPropsSelected"
+                        @toggle-all-product-props-selected="toogleAllProductPropsSelected"
+                        @toggle-exclude-product-props="toggleExcludedProductProps"
                 />
                 <Table
                         @change-sort-order="changeSortOrder"
                         :sort-order="sortOrder"
-                        :product-props="productProps"
+                        :active-product-prop="activeProductProp"
                         :filtered-products="productsOnPage"
+
+                        :filtered-and-sorted-product-props="filteredAndSortedProductProps"
                 />
             </template>
         </div>
@@ -48,36 +58,55 @@
             return {
                 products: [],
                 productProps: [
-                    {name: 'product', value: 'Product (100g serving)', isActive: true, id: 1},
-                    {name: 'calories', value: 'Calories', isActive: false, id: 2},
-                    {name: 'fat', value: 'Fat (g)', isActive: false, id: 3},
-                    {name: 'carbs', value: 'Carbs (g)', isActive: false, id: 4},
-                    {name: 'protein', value: 'Protein (g)', isActive: false, id: 5},
-                    {name: 'iron', value: 'Iron (%)', isActive: false, id: 6}
+                    {name: 'product', value: 'Product (100g serving)'},
+                    {name: 'calories', value: 'Calories'},
+                    {name: 'fat', value: 'Fat (g)'},
+                    {name: 'carbs', value: 'Carbs (g)'},
+                    {name: 'protein', value: 'Protein (g)'},
+                    {name: 'iron', value: 'Iron (%)'}
                 ],
+                excludedProductProps: [],
+                allProductPropsExcluded: false,
                 activeProductProp: 'product',
                 isError: false,
                 isLoading: true,
-                selectedProductsPerPage: '10',
+                productsPerPage: '10',
                 currentPage: 0,
                 sortOrder: 'high-low',
+                isSelectExpandedVisible: false
             }
         },
         computed: {
             productsOnPage() {
-                const correction = this.currentPage * this.selectedProductsPerPage
+                const correction = this.currentPage * this.productsPerPage
                 return this.products
+                    .filter(() => true)
+                    .sort((a, b) => {
+                        return this.sortOrder === 'high-low' ?
+                            (a[this.activeProductProp] <= b[this.activeProductProp] ? 1 : -1) :
+                            (a[this.activeProductProp] >= b[this.activeProductProp] ? 1 : -1)
+                    })
                     .slice(
                         correction,
-                        Number(this.selectedProductsPerPage) + correction
+                        Number(this.productsPerPage) + correction
                     )
             },
+            filteredAndSortedProductProps() {
+                return this.productProps
+                    .filter(p => !this.excludedProductProps.includes(p.name))
+                    // made active prop first by sorting
+                    // (if second prop active then swap otherwise don't touch)
+                    .sort(second => second.name === this.activeProductProp ? -1 : 0)
+            },
+            isAllProductPropsSelected() {
+                return this.excludedProductProps.length ? false : true
+            },
             productsStartFrom() {
-                return this.currentPage * this.selectedProductsPerPage + 1
+                return this.currentPage * this.productsPerPage + 1
             },
             productsEndTo() {
                 const productsAmount = this.products.length
-                const possibleValue = (this.currentPage  + 1) * this.selectedProductsPerPage
+                const possibleValue = (this.currentPage  + 1) * this.productsPerPage
 
                 return (productsAmount > possibleValue)
                     ? possibleValue
@@ -85,41 +114,24 @@
             }
         },
         methods: {
+            // click on sorting-btn
             chooseFirstColumn(e) {
                 const target = e.target.closest('button')
                 if (!target) return
 
-                const productProps = this.productProps
-                // sort to save order
-                productProps.sort((a, b) => a.id - b.id)
-                // find index of choosen prop
-                const propIndex = productProps.findIndex(
-                    prop => prop.name === target.dataset.propName
-                )
-                // change active condition
-                productProps.forEach((prop, i) => {
-                    prop.isActive = i === propIndex
-                })
-                // make new array with new first prop
-                this.productProps = [
-                    productProps[propIndex],
-                    ...productProps.slice(0, propIndex),
-                    ...productProps.slice(propIndex + 1)
-                ]
-                // to show which prop is first
-                this.activeProductProp = productProps[propIndex].name
-                // sort
-                this.products.sort(this.sortBy(this.sortOrder))
-                // reset current page
+                this.activeProductProp = target.dataset.propName
                 this.changeCurrentPage('reset')
             },
-            onChangeSelectedProductsPerPage(value) {
-                this._changeSelectedProductsPerPage(value)
+            // end click on sorting-btn
+
+            // select product per page
+            onChangeProductsPerPage(value) {
+                this.productsPerPage = value
                 this.changeCurrentPage('reset')
             },
-            _changeSelectedProductsPerPage(value) {
-                this.selectedProductsPerPage = value
-            },
+            // end select product per page
+
+            // navigation
             changeCurrentPage(direction) {
                 switch (direction) {
                     case 'forward':
@@ -133,29 +145,68 @@
                         break
                 }
             },
+            // end navigation
+
+            // products sort order change
             changeSortOrder(e) {
                 const target = e.target.closest('.active')
                 if (!target) return
 
-                const order = this.sortOrder === 'high-low' ? 'low-high': 'high-low'
-                this.sortOrder = order
-                this.products.sort(this.sortBy(order))
+                this.sortOrder = this.sortOrder === 'high-low' ? 'low-high' : 'high-low'
                 this.changeCurrentPage('reset')
             },
-            sortBy(order) {
-                switch (order) {
-                    case 'high-low':
-                        return this._sortByHighFn()
-                    case 'low-high':
-                        return this._sortByLowFn()
+            // end products sort order change
+
+            // change checkboxes with product props
+            toggleExcludedProductProps(e) {
+                if (!e.target.closest('input')) return
+                const propName = e.target.value
+                console.log(e.target.checked)
+
+                // delete from excluded props
+                if (this.excludedProductProps.includes(propName)) {
+                    const i = this.excludedProductProps.findIndex(pName => pName === propName)
+                    this.excludedProductProps.splice(i, 1)
+
+                    // make first enabled prop active
+                    if (this.allProductPropsExcluded) {
+                        this.activeProductProp = propName
+                        this.allProductPropsExcluded = false
+                        this.changeCurrentPage('reset')
+                    }
+                // add to excluded props
+                } else {
+                    this.excludedProductProps.push(propName)
+
+                    const productProps = this.productProps
+
+                    const prop = productProps.find( p => p.name === propName)
+                    // if this prop was active
+                    if (prop.name === this.activeProductProp) {
+                        // find first inactive prop
+                        const inactiveProp = productProps.find(
+                            p => !this.excludedProductProps.includes(p.name)
+                        )
+                        if (inactiveProp !== undefined) {
+                            this.activeProductProp = inactiveProp.name
+                            this.changeCurrentPage('reset')
+                        } else {
+                            this.allProductPropsExcluded = true
+                        }
+                    }
                 }
             },
-            _sortByLowFn() {
-                return (a, b) => a[this.activeProductProp] > b[this.activeProductProp] ? 1 : -1
+            //end change checkboxes with product props
+            toggleSelectExpandedVisible() {
+                this.isSelectExpandedVisible = !this.isSelectExpandedVisible
             },
-            _sortByHighFn() {
-                return (a, b) => a[this.activeProductProp] < b[this.activeProductProp] ? 1 : -1
-            },
+            toogleAllProductPropsSelected() {
+                if (this.isAllProductPropsSelected) {
+                    this.excludedProductProps = this.productProps.map(prop => prop.name)
+                } else {
+                    this.excludedProductProps = []
+                }
+            }
         },
 
         // watch: {
@@ -167,8 +218,7 @@
             getProducts()
                 .then(products => {
                     this.isLoading = false
-                    // sort before creating table
-                    this.products = products.sort(this.sortBy(this.sortOrder))
+                    this.products = products
                 })
                 .catch(e => {
                     console.error(e.error)
@@ -200,8 +250,8 @@
     }
 
     .container {
-      max-width: 1140px;
-      margin: auto;
+        max-width: 1140px;
+        margin: auto;
     }
 
     .container .title {
@@ -220,6 +270,30 @@
     }
 
     input[type="checkbox"] {
-        color: #00A11E;
+        position:absolute;
+        left:-9999px;
+    }
+    label {
+        display: inline-block;
+        cursor: pointer;
+    }
+    input[type="checkbox"] + .checkmark:before {
+        content: "\00a0";
+        display: inline-block;
+        height: 1rem;
+        width: 1rem;
+        margin: 0 .25em 4px 0;
+        padding: 0;
+        border: 1px solid #C6CBD4;
+        border-radius: 1px;
+        line-height: 1.1rem;
+        vertical-align: bottom;
+    }
+    input[type="checkbox"]:checked + .checkmark:before {
+        background: #00A11E;
+        border: 1px solid #00A11E;
+        color: #fff;
+        content: "\2713";
+        text-align: center;
     }
 </style>
