@@ -33,6 +33,7 @@
                         :filtered-products="productsOnPage"
 
                         :filtered-and-sorted-product-props="filteredAndSortedProductProps"
+                        @on-t-body-row-click="onTBodyRowClick"
                 />
             </template>
         </div>
@@ -147,16 +148,6 @@
             },
             // end navigation
 
-            // products sort order change
-            changeSortOrder(e) {
-                const target = e.target.closest('.active')
-                if (!target) return
-
-                this.sortOrder = this.sortOrder === 'high-low' ? 'low-high' : 'high-low'
-                this.changeCurrentPage('reset')
-            },
-            // end products sort order change
-
             // change checkboxes with product props
             toggleExcludedProductProps(e) {
                 if (!e.target.closest('input')) return
@@ -205,6 +196,31 @@
                     this.excludedProductProps = this.productProps.map(prop => prop.name)
                 } else {
                     this.excludedProductProps = []
+                }
+            },
+
+            // products sort order change
+            changeSortOrder(e) {
+                const target = e.target.closest('.active')
+                if (!target) return
+
+                this.sortOrder = this.sortOrder === 'high-low' ? 'low-high' : 'high-low'
+                this.changeCurrentPage('reset')
+            },
+            // end products sort order change
+
+            onTBodyRowClick(e) {
+                const btn = e.target.closest('.delete-one')
+                const tr = e.target.closest('.tbody-row')
+
+                if (!btn && !tr) return
+                const productId = +tr.dataset.id
+                if (btn) {
+                    const index = this.products.findIndex(product => product.id === productId)
+                    this.products.splice(index, 1)
+                    // removeOneById(productId)
+                } else {
+                    console.log('haha')
                 }
             }
         },

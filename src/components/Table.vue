@@ -16,10 +16,12 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody @click="$emit('on-t-body-row-click', $event)">
             <tr
                 v-for="product in filteredProducts"
                 :key="product.id"
+                :data-id="product.id"
+                class="tbody-row"
             >
                 <td>
                     <div class="checkbox">
@@ -36,8 +38,8 @@
                     {{product[productProp.name]}}
                 </td>
                 <td>
-                    <div class="delete">
-                        <button>
+                    <div class="delete-wrap">
+                        <button class="delete-one">
                             <img src="../assets/svg/Group.svg" alt="cart">delete
                         </button>
                     </div>
@@ -61,6 +63,9 @@
             filteredAndSortedProductProps: {
                 type: Array
             }
+        },
+        methods: {
+
         }
     }
 </script>
@@ -88,6 +93,7 @@
 
     tbody tr:hover {
         background-color: rgba(0, 161, 30, 0.07);
+        cursor: pointer;
     }
 
 
@@ -123,18 +129,18 @@
         width: 180px;
     }
 
-    .delete {
+    .delete-wrap {
         display: flex;
         justify-content: flex-end;
-        margin-right: 2rem;
     }
-    .delete button {
+    .delete-wrap button {
         visibility: hidden;
         display: flex;
+        margin-right: 2rem;
         align-items: center;
         color: #5B5E77;
     }
-    tbody tr:hover .delete button {
+    tbody tr:hover .delete-wrap button {
         visibility: visible;
     }
 
