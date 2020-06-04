@@ -16,7 +16,7 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody @click="$emit('on-t-body-row-click', $event)">
+        <tbody @click.prevent="$emit('on-t-body-row-click', $event)">
             <tr
                 v-for="product in filteredProducts"
                 :key="product.id"
@@ -26,7 +26,7 @@
                 <td>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox">
+                            <input type="checkbox" :checked="idProductsForDelete.includes(product.id)">
                             <span class="checkmark"></span>
                         </label>
                     </div>
@@ -47,6 +47,7 @@
             </tr>
         </tbody>
     </table>
+
 </template>
 
 <script>
@@ -61,6 +62,9 @@
                 required: true
             },
             filteredAndSortedProductProps: {
+                type: Array
+            },
+            idProductsForDelete: {
                 type: Array
             }
         },
@@ -146,5 +150,9 @@
 
     label {
         margin-left: 2rem;
+    }
+
+    .delete-one:hover {
+        opacity: .7;
     }
 </style>

@@ -5,6 +5,7 @@
             <Loader v-if="isLoading"/>
             <Error v-else-if="isError"/>
             <template v-else>
+                <button @click="fuuuuuck">show</button>
                 <FiltersBar
                         :product-props="productProps"
                         @choose-first-column="chooseFirstColumn"
@@ -25,12 +26,22 @@
                         :is-all-product-props-selected="isAllProductPropsSelected"
                         @toggle-all-product-props-selected="toogleAllProductPropsSelected"
                         @toggle-exclude-product-props="toggleExcludedProductProps"
+
+
+                        :is-delete-confirm-visible="isDeleteConfirmVisible"
+                        :delete-confirm-coords="deleteConfirmCoords"
+                        @hide-delete-confirm="hideDeleteConfirm"
+                        @remove-products-by-id="removeProductsById"
+                        :id-products-for-delete="idProductsForDelete"
+                        @show-delete-confirm="showDeleteConfirm"
                 />
                 <Table
                         @change-sort-order="changeSortOrder"
                         :sort-order="sortOrder"
                         :active-product-prop="activeProductProp"
                         :filtered-products="productsOnPage"
+
+                        :id-products-for-delete="idProductsForDelete"
 
                         :filtered-and-sorted-product-props="filteredAndSortedProductProps"
                         @on-t-body-row-click="onTBodyRowClick"
@@ -74,7 +85,10 @@
                 productsPerPage: '10',
                 currentPage: 0,
                 sortOrder: 'high-low',
-                isSelectExpandedVisible: false
+                isSelectExpandedVisible: false,
+                isDeleteConfirmVisible: false,
+                deleteConfirmCoords: {},
+                idProductsForDelete: []
             }
         },
         computed: {
@@ -115,6 +129,13 @@
             }
         },
         methods: {
+            fuuuuuck() {
+                console.log(this.idProductsForDelete)
+            },
+
+
+
+
             // click on sorting-btn
             chooseFirstColumn(e) {
                 const target = e.target.closest('button')
@@ -214,14 +235,45 @@
                 const tr = e.target.closest('.tbody-row')
 
                 if (!btn && !tr) return
-                const productId = +tr.dataset.id
+                const productId = Number(tr.dataset.id)
+                const coordFromTop = tr.getBoundingClientRect().bottom + window.pageYOffset - 180
+
                 if (btn) {
-                    const index = this.products.findIndex(product => product.id === productId)
-                    this.products.splice(index, 1)
+                    // const index = this.products.findIndex(product => product.id === productId)
+                    // this.products.splice(index, 1)
                     // removeOneById(productId)
+                    this.idProductsForDelete = [productId]
+                    this.setDeleteConfirmCoords(coordFromTop)
+                    this.showDeleteConfirm()
                 } else {
-                    console.log('haha')
+                    if (this.idProductsForDelete.includes(productId)) {
+                        this.idProductsForDelete = this.idProductsForDelete.filter(
+                            id => id !== productId
+                        )
+                    } else {
+                        this.idProductsForDelete.push(productId)
+                        this.setDeleteConfirmCoords(coordFromTop)
+                    }
+                    console.log('memory leak (2 times click on checkbox)')
                 }
+            },
+            showDeleteConfirm() {
+                this.isDeleteConfirmVisible = true
+            },
+            hideDeleteConfirm() {
+                this.isDeleteConfirmVisible = false
+                this.idProductsForDelete = []
+            },
+            setDeleteConfirmCoords(coordFromTop) {
+                this.deleteConfirmCoords = {
+                    top: coordFromTop + 'px'
+                }
+            },
+            removeProductsById() {
+                this.products = this.products.filter(
+                    product => !this.idProductsForDelete.includes(product.id)
+                )
+                this.hideDeleteConfirm()
             }
         },
 
