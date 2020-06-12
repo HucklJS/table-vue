@@ -5,7 +5,6 @@
             <Loader v-if="isLoading"/>
             <Error v-else-if="isError"/>
             <template v-else>
-                <button @click="fuuuuuck">show</button>
                 <FiltersBar
                         :product-props="productProps"
                         @choose-first-column="chooseFirstColumn"
@@ -35,7 +34,9 @@
                         :id-products-for-delete="idProductsForDelete"
                         @show-delete-confirm="showDeleteConfirm"
                 />
-                <Table
+                <p v-if="allProductPropsExcluded" class="no-table">You should on at least one product prop</p>
+<!--                Поправить ошибку при выключении сразу всех props-ов-->
+                <Table  v-else
                         @change-sort-order="changeSortOrder"
                         :sort-order="sortOrder"
                         :active-product-prop="activeProductProp"
@@ -129,13 +130,6 @@
             }
         },
         methods: {
-            fuuuuuck() {
-                console.log(this.idProductsForDelete)
-            },
-
-
-
-
             // click on sorting-btn
             chooseFirstColumn(e) {
                 const target = e.target.closest('button')
@@ -298,6 +292,27 @@
 </script>
 
 <style>
+    @font-face {
+        font-family: 'Source Sans Pro';
+        src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'),
+        url('assets/fonts/SourceSansPro-Regular.woff2') format('woff2'),
+        url('assets/fonts/SourceSansPro-Regular.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'Source Sans Pro';
+        src: local('Source Sans Pro SemiBold'), local('SourceSansPro-SemiBold'),
+        url('assets/fonts/SourceSansPro-SemiBold.woff2') format('woff2'),
+        url('assets/fonts/SourceSansPro-SemiBold.woff') format('woff');
+        font-weight: bold;
+        font-style: normal;
+        font-display: swap;
+    }
+
+
     body {
         background-color: #F2F2F2;
 
@@ -322,7 +337,7 @@
         margin: auto;
     }
 
-    .container .title {
+    .title {
         padding: 1rem 0;
         margin-bottom: 1rem;
         border-bottom: 2px solid #EDEDED;

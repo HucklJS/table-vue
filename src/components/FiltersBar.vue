@@ -1,7 +1,7 @@
 <template>
     <div class="filters">
         <div class="sorting-btns" @click="$emit('choose-first-column', $event)">
-            <span>Sorting by:</span>
+            <span class="text">Sorting by:</span>
             <button
                     v-for="productProp in productProps"
                     :key="productProp.id"
@@ -174,16 +174,10 @@
         margin-bottom: 1rem;
     }
 
-
     .sorting-btns,
     .other-elements{
         display: flex;
         align-items: center;
-    }
-
-    .choose-columns-wrap {
-        position: relative;
-        height: 100%;
     }
 
     .sorting-btns button,
@@ -194,10 +188,19 @@
     }
 
     button.active {
-        padding: 3px 6px;
-        margin-left: .5rem;
+        /*padding: 3px 6px;*/
         background-color: #00A11E;
         color: #FFFFFF;
+        cursor: pointer;
+    }
+
+    .sorting-btns .text {
+        display: inline-block;
+        /*???????????*/
+        margin-right: .5rem;
+    }
+
+    .sorting-btns button.active {
         cursor: default;
     }
 
@@ -213,27 +216,18 @@
     }
 
     :disabled {
-        position: relative;
-    }
-    :disabled:before {
-        content: '';
-        position: absolute;
-        left: -1px;
-        right: -1px;
-        top: -1px;
-        bottom: -1px;
-        background-color: #F2F2F2;
-        opacity: .6;
-        cursor: default !important;
+        opacity: .3;
+        cursor: default;
     }
 
     .other-elements select,
-    button.choose-columns {
+    .other-elements button.choose-columns {
         padding: 4px 27px 4.5px 10px;
         background: transparent url("../assets/svg/Select-arrow.svg") no-repeat right;
         background-position-x: calc(100% - 10px);
         background-position-y: calc(100% - 11.3px);
     }
+
 
     .other-elements select {
         appearance: none;
@@ -246,15 +240,10 @@
         display: none;
     }
 
-    /*.other-elements select#choose-columns {*/
-    /*    margin-right: 0;*/
-    /*}*/
-
     .other-elements button.nav-arrow {
         width: 32px;
         padding: 2px 12px;
         margin: 0 8px;
-        border: 1px solid #D5DAE0;
     }
 
     .other-elements button.left-arrow {
@@ -267,10 +256,16 @@
         background: transparent url("../assets/svg/Right.svg") no-repeat center;
     }
 
+
+    /*6 columns selected*/
+    .choose-columns-wrap {
+        position: relative;
+        height: 100%;
+    }
+
     .wrapper {
         position: absolute;
         width: 207px;
-
     }
 
     .select-expanded {
@@ -320,12 +315,10 @@
     }
     .delete-confirm-btns {
         display: inline-block;
+        height: 32px;
     }
-    .cancel, .confirm {
-        height: 32px !important;
-    }
-    .confirm {
-        margin-left: 16px !important;
-        border: none !important;
+    .delete-confirm-btns .confirm {
+        margin-left: 16px;
+        border: none;
     }
 </style>
