@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {getProducts} from "../from-server/request"
+import mutations from "./mutations/mutations"
+import actions from "./actions/actions"
 
 Vue.use(Vuex)
 
@@ -9,32 +10,26 @@ export default new Vuex.Store({
     products: [],
     isError: false,
     isLoading: true,
+    productsPerPage: '10',
+    currentPage: 0,
+    sortOrder: 'high-low',
+    activeProductProp: 'product',
   },
-  mutations: {
-    saveProducts(state, products) {
-      state.products = products
-    },
-    finishLoading(state) {
-      state.isLoading = false
-    },
-    generateError(state) {
-      state.isError = true
+  getters: {
+    productsOnPage: state => {
+      const correction = state.currentPage * state.productsPerPage
+      return [...state.products]
+          .sort((a, b) => {
+            return state.sortOrder === 'high-low' ?
+                (a[state.activeProductProp] <= b[state.activeProductProp] ? 1 : -1) :
+                (a[state.activeProductProp] >= b[state.activeProductProp] ? 1 : -1)
+          })
+          .slice(
+              correction,
+              Number(state.productsPerPage) + correction
+          )
     }
   },
-  actions: {
-    getProductsFromApi(context) {
-      getProducts()
-          .then(products => {
-            context.commit('finishLoading')
-            context.commit('saveProducts', products)
-          })
-          .catch(e => {
-            console.error(e.error)
-            context.commit('finishLoading')
-            context.commit('generateError')
-          })
-    }
-  },
-  modules: {
-  }
+  mutations: mutations,
+  actions: actions
 })

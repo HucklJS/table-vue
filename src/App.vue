@@ -17,7 +17,7 @@
                         :products-start-from="productsStartFrom"
                         :products-end-to="productsEndTo"
 
-                        @change-current-page="changeCurrentPage"
+                        @change-current-page="CHANGE_CURRENT_PAGE"
 
                         :is-select-expanded-visible="isSelectExpandedVisible"
                         @toggle-select-expanded-visible="toggleSelectExpandedVisible"
@@ -57,7 +57,7 @@
     import Table from './components/Table'
     import Error from "./components/Error"
     import Loader from "./components/Loader"
-    import {mapActions, mapState} from "vuex"
+    import {mapActions, mapGetters, mapMutations, mapState} from "vuex"
 
     export default {
         name: 'App',
@@ -80,10 +80,6 @@
                 excludedProductProps: [],
                 // change to computed
                 isAllProductPropsExcluded: false,
-                activeProductProp: 'product',
-                productsPerPage: '10',
-                currentPage: 0,
-                sortOrder: 'high-low',
                 isSelectExpandedVisible: false,
                 isDeleteConfirmVisible: false,
                 deleteConfirmCoords: {},
@@ -94,22 +90,15 @@
             ...mapState([
                 'products',
                 'isError',
-                'isLoading'
+                'isLoading',
+                'activeProductProp',
+                'productsPerPage',
+                'currentPage',
+                'sortOrder'
             ]),
-            productsOnPage() {
-                const correction = this.currentPage * this.productsPerPage
-                return this.products
-                    .filter(() => true)
-                    .sort((a, b) => {
-                        return this.sortOrder === 'high-low' ?
-                            (a[this.activeProductProp] <= b[this.activeProductProp] ? 1 : -1) :
-                            (a[this.activeProductProp] >= b[this.activeProductProp] ? 1 : -1)
-                    })
-                    .slice(
-                        correction,
-                        Number(this.productsPerPage) + correction
-                    )
-            },
+            ...mapGetters([
+                'productsOnPage'
+            ]),
             filteredAndSortedProductProps() {
                 return this.productProps
                     .filter(p => !this.excludedProductProps.includes(p.name))
@@ -133,8 +122,12 @@
             }
         },
         methods: {
+            ...mapMutations([
+                'CHANGE_CURRENT_PAGE'
+            ]),
             ...mapActions([
-                'getProductsFromApi'
+                'getProductsFromApi',
+                'onChangeProductsPerPage'
             ]),
             // click on sorting-btn
             chooseFirstColumn(e) {
@@ -145,29 +138,6 @@
                 this.changeCurrentPage('reset')
             },
             // end click on sorting-btn
-
-            // select product per page
-            onChangeProductsPerPage(value) {
-                this.productsPerPage = value
-                this.changeCurrentPage('reset')
-            },
-            // end select product per page
-
-            // navigation
-            changeCurrentPage(direction) {
-                switch (direction) {
-                    case 'forward':
-                        this.currentPage++
-                        break
-                    case 'back':
-                        this.currentPage--
-                        break
-                    case 'reset':
-                        this.currentPage = 0
-                        break
-                }
-            },
-            // end navigation
 
             // change checkboxes with product props
             toggleExcludedProductProps(e) {
