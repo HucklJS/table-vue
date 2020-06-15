@@ -34,7 +34,7 @@
                         :id-products-for-delete="idProductsForDelete"
                         @show-delete-confirm="showDeleteConfirm"
                 />
-                <p v-if="allProductPropsExcluded" class="no-table">You should on at least one product prop</p>
+                <p v-if="isAllProductPropsExcluded" class="no-table">You should on at least one product prop</p>
 <!--                Поправить ошибку при выключении сразу всех props-ов-->
                 <Table  v-else
                         @change-sort-order="changeSortOrder"
@@ -57,7 +57,7 @@
     import Table from './components/Table'
     import Error from "./components/Error"
     import Loader from "./components/Loader"
-    import {getProducts} from './from-server/request'
+    import {mapActions, mapState} from "vuex"
 
     export default {
         name: 'App',
@@ -69,7 +69,6 @@
         },
         data() {
             return {
-                products: [],
                 productProps: [
                     {name: 'product', value: 'Product (100g serving)'},
                     {name: 'calories', value: 'Calories'},
@@ -79,10 +78,9 @@
                     {name: 'iron', value: 'Iron (%)'}
                 ],
                 excludedProductProps: [],
-                allProductPropsExcluded: false,
+                // change to computed
+                isAllProductPropsExcluded: false,
                 activeProductProp: 'product',
-                isError: false,
-                isLoading: true,
                 productsPerPage: '10',
                 currentPage: 0,
                 sortOrder: 'high-low',
@@ -93,6 +91,11 @@
             }
         },
         computed: {
+            ...mapState([
+                'products',
+                'isError',
+                'isLoading'
+            ]),
             productsOnPage() {
                 const correction = this.currentPage * this.productsPerPage
                 return this.products
@@ -130,6 +133,9 @@
             }
         },
         methods: {
+            ...mapActions([
+                'getProductsFromApi'
+            ]),
             // click on sorting-btn
             chooseFirstColumn(e) {
                 const target = e.target.closest('button')
@@ -175,9 +181,9 @@
                     this.excludedProductProps.splice(i, 1)
 
                     // make first enabled prop active
-                    if (this.allProductPropsExcluded) {
+                    if (this.isAllProductPropsExcluded) {
                         this.activeProductProp = propName
-                        this.allProductPropsExcluded = false
+                        this.isAllProductPropsExcluded = false
                         this.changeCurrentPage('reset')
                     }
                 // add to excluded props
@@ -197,7 +203,7 @@
                             this.activeProductProp = inactiveProp.name
                             this.changeCurrentPage('reset')
                         } else {
-                            this.allProductPropsExcluded = true
+                            this.isAllProductPropsExcluded = true
                         }
                     }
                 }
@@ -276,17 +282,8 @@
         //         console.log(this.selectedProductsPerPage)
         //     }
         // },
-        mounted() {
-            getProducts()
-                .then(products => {
-                    this.isLoading = false
-                    this.products = products
-                })
-                .catch(e => {
-                    console.error(e.error)
-                    this.isLoading = false
-                    this.isError = true
-                })
+        created() {
+            this.getProductsFromApi()
         }
     }
 </script>
