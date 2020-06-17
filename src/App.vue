@@ -7,42 +7,42 @@
             <template v-else>
                 <FiltersBar
                         :product-props="productProps"
-                        @choose-first-column="chooseFirstColumn"
+                        @choose-first-column="onChooseFirstColumn"
                         :active-product-prop="activeProductProp"
 
                         :selected-products-per-page="productsPerPage"
-                        @on-change-selected-products-per-page="onChangeProductsPerPage"
+                        @on-change-selected-products-per-page="changeProductsPerPage"
 
                         :products-amount="products.length"
                         :products-start-from="productsStartFrom"
                         :products-end-to="productsEndTo"
 
-                        @change-current-page="CHANGE_CURRENT_PAGE"
+                        @change-current-page="changeCurrentPage"
 
                         :is-select-expanded-visible="isSelectExpandedVisible"
-                        @toggle-select-expanded-visible="toggleSelectExpandedVisible"
+                        @toggle-select-expanded-visible="onToggleSelectExpandedVisible"
                         :excluded-product-props="excludedProductProps"
                         :is-all-product-props-selected="isAllProductPropsSelected"
-                        @toggle-all-product-props-selected="toogleAllProductPropsSelected"
-                        @toggle-exclude-product-props="toggleExcludedProductProps"
+                        @toggle-all-product-props-selected="onToggleAllProductPropsSelected"
+                        @toggle-exclude-product-props="onToggleExcludedProductProp"
 
 
                         :is-delete-confirm-visible="isDeleteConfirmVisible"
                         :delete-confirm-coords="deleteConfirmCoords"
                         @hide-delete-confirm="hideDeleteConfirm"
                         @remove-products-by-id="removeProductsById"
-                        :id-products-for-delete="idProductsForDelete"
+                        :id-products-for-delete="idsProductsForDelete"
                         @show-delete-confirm="showDeleteConfirm"
                 />
                 <p v-if="isAllProductPropsExcluded" class="no-table">You should on at least one product prop</p>
 <!--                Поправить ошибку при выключении сразу всех props-ов-->
                 <Table  v-else
-                        @change-sort-order="changeSortOrder"
+                        @change-sort-order="onToggleSortOrder"
                         :sort-order="sortOrder"
                         :active-product-prop="activeProductProp"
                         :filtered-products="productsOnPage"
 
-                        :id-products-for-delete="idProductsForDelete"
+                        :id-products-for-delete="idsProductsForDelete"
 
                         :filtered-and-sorted-product-props="filteredAndSortedProductProps"
                         @on-t-body-row-click="onTBodyRowClick"
@@ -57,7 +57,7 @@
     import Table from './components/Table'
     import Error from "./components/Error"
     import Loader from "./components/Loader"
-    import {mapActions, mapGetters, mapMutations, mapState} from "vuex"
+    import {mapActions, mapGetters, mapState} from "vuex"
 
     export default {
         name: 'App',
@@ -69,21 +69,7 @@
         },
         data() {
             return {
-                productProps: [
-                    {name: 'product', value: 'Product (100g serving)'},
-                    {name: 'calories', value: 'Calories'},
-                    {name: 'fat', value: 'Fat (g)'},
-                    {name: 'carbs', value: 'Carbs (g)'},
-                    {name: 'protein', value: 'Protein (g)'},
-                    {name: 'iron', value: 'Iron (%)'}
-                ],
-                excludedProductProps: [],
-                // change to computed
-                isAllProductPropsExcluded: false,
-                isSelectExpandedVisible: false,
-                isDeleteConfirmVisible: false,
-                deleteConfirmCoords: {},
-                idProductsForDelete: []
+
             }
         },
         computed: {
@@ -94,111 +80,72 @@
                 'activeProductProp',
                 'productsPerPage',
                 'currentPage',
-                'sortOrder'
+                'sortOrder',
+                'productProps',
+                'excludedProductProps',
+                'isSelectExpandedVisible',
+                'idsProductsForDelete',
+                'deleteConfirmCoords',
+                'isDeleteConfirmVisible'
             ]),
             ...mapGetters([
-                'productsOnPage'
+                'productsOnPage',
+                'productsStartFrom',
+                'productsEndTo',
+                'isAllProductPropsExcluded',
+                'isAllProductPropsSelected',
+                'filteredAndSortedProductProps'
             ]),
-            filteredAndSortedProductProps() {
-                return this.productProps
-                    .filter(p => !this.excludedProductProps.includes(p.name))
-                    // made active prop first by sorting
-                    // (if second prop active then swap otherwise don't touch)
-                    .sort(second => second.name === this.activeProductProp ? -1 : 0)
-            },
-            isAllProductPropsSelected() {
-                return this.excludedProductProps.length ? false : true
-            },
-            productsStartFrom() {
-                return this.currentPage * this.productsPerPage + 1
-            },
-            productsEndTo() {
-                const productsAmount = this.products.length
-                const possibleValue = (this.currentPage  + 1) * this.productsPerPage
-
-                return (productsAmount > possibleValue)
-                    ? possibleValue
-                    : productsAmount
-            }
         },
         methods: {
-            ...mapMutations([
-                'CHANGE_CURRENT_PAGE'
-            ]),
             ...mapActions([
                 'getProductsFromApi',
-                'onChangeProductsPerPage'
+                'changeProductsPerPage',
+                'changeCurrentPage',
+                'toggleSortOrder',
+                'chooseFirstColumn',
+                'toggleExcludedProductProp',
+                'toggleAllProductPropsSelected',
+                'toggleSelectExpandedVisible',
+                'prepareToRemoveOneProduct',
+                'toggleIdsProductsForDelete',
+                'showDeleteConfirm',
+                'hideDeleteConfirm',
+                'removeProductsById'
             ]),
-            // click on sorting-btn
-            chooseFirstColumn(e) {
+            onChooseFirstColumn(e) {
                 const target = e.target.closest('button')
                 if (!target) return
 
-                this.activeProductProp = target.dataset.propName
-                this.changeCurrentPage('reset')
+                this.chooseFirstColumn(target.dataset.propName)
             },
-            // end click on sorting-btn
 
             // change checkboxes with product props
-            toggleExcludedProductProps(e) {
+            onToggleExcludedProductProp(e) {
                 if (!e.target.closest('input')) return
                 const propName = e.target.value
-                console.log(e.target.checked)
 
-                // delete from excluded props
-                if (this.excludedProductProps.includes(propName)) {
-                    const i = this.excludedProductProps.findIndex(pName => pName === propName)
-                    this.excludedProductProps.splice(i, 1)
-
-                    // make first enabled prop active
-                    if (this.isAllProductPropsExcluded) {
-                        this.activeProductProp = propName
-                        this.isAllProductPropsExcluded = false
-                        this.changeCurrentPage('reset')
-                    }
-                // add to excluded props
-                } else {
-                    this.excludedProductProps.push(propName)
-
-                    const productProps = this.productProps
-
-                    const prop = productProps.find( p => p.name === propName)
-                    // if this prop was active
-                    if (prop.name === this.activeProductProp) {
-                        // find first inactive prop
-                        const inactiveProp = productProps.find(
-                            p => !this.excludedProductProps.includes(p.name)
-                        )
-                        if (inactiveProp !== undefined) {
-                            this.activeProductProp = inactiveProp.name
-                            this.changeCurrentPage('reset')
-                        } else {
-                            this.isAllProductPropsExcluded = true
-                        }
-                    }
-                }
+                this.toggleExcludedProductProp(propName)
             },
             //end change checkboxes with product props
-            toggleSelectExpandedVisible() {
-                this.isSelectExpandedVisible = !this.isSelectExpandedVisible
-            },
-            toogleAllProductPropsSelected() {
-                if (this.isAllProductPropsSelected) {
-                    this.excludedProductProps = this.productProps.map(prop => prop.name)
-                } else {
-                    this.excludedProductProps = []
-                }
+
+            onToggleAllProductPropsSelected() {
+                this.toggleAllProductPropsSelected()
             },
 
-            // products sort order change
-            changeSortOrder(e) {
+            onToggleSortOrder(e) {
                 const target = e.target.closest('.active')
                 if (!target) return
 
-                this.sortOrder = this.sortOrder === 'high-low' ? 'low-high' : 'high-low'
-                this.changeCurrentPage('reset')
+                this.toggleSortOrder()
             },
-            // end products sort order change
+
+            onToggleSelectExpandedVisible() {
+                this.toggleSelectExpandedVisible()
+            },
+
+
+
 
             onTBodyRowClick(e) {
                 const btn = e.target.closest('.delete-one')
@@ -209,42 +156,18 @@
                 const coordFromTop = tr.getBoundingClientRect().bottom + window.pageYOffset - 180
 
                 if (btn) {
-                    // const index = this.products.findIndex(product => product.id === productId)
-                    // this.products.splice(index, 1)
-                    // removeOneById(productId)
-                    this.idProductsForDelete = [productId]
-                    this.setDeleteConfirmCoords(coordFromTop)
-                    this.showDeleteConfirm()
+                    this.prepareToRemoveOneProduct({
+                        productId,
+                        coordFromTop
+                    })
                 } else {
-                    if (this.idProductsForDelete.includes(productId)) {
-                        this.idProductsForDelete = this.idProductsForDelete.filter(
-                            id => id !== productId
-                        )
-                    } else {
-                        this.idProductsForDelete.push(productId)
-                        this.setDeleteConfirmCoords(coordFromTop)
-                    }
-                    console.log('memory leak (2 times click on checkbox)')
+                    this.toggleIdsProductsForDelete({
+                        productId,
+                        coordFromTop
+                    })
                 }
             },
-            showDeleteConfirm() {
-                this.isDeleteConfirmVisible = true
-            },
-            hideDeleteConfirm() {
-                this.isDeleteConfirmVisible = false
-                this.idProductsForDelete = []
-            },
-            setDeleteConfirmCoords(coordFromTop) {
-                this.deleteConfirmCoords = {
-                    top: coordFromTop + 'px'
-                }
-            },
-            removeProductsById() {
-                this.products = this.products.filter(
-                    product => !this.idProductsForDelete.includes(product.id)
-                )
-                this.hideDeleteConfirm()
-            }
+
         },
 
         // watch: {

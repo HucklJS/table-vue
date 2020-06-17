@@ -13,7 +13,21 @@ export default new Vuex.Store({
     productsPerPage: '10',
     currentPage: 0,
     sortOrder: 'high-low',
+    // change to activeProductPropName
     activeProductProp: 'product',
+    productProps: [
+      {name: 'product', value: 'Product (100g serving)'},
+      {name: 'calories', value: 'Calories'},
+      {name: 'fat', value: 'Fat (g)'},
+      {name: 'carbs', value: 'Carbs (g)'},
+      {name: 'protein', value: 'Protein (g)'},
+      {name: 'iron', value: 'Iron (%)'}
+    ],
+    excludedProductProps: [],
+    isSelectExpandedVisible: false,
+    idsProductsForDelete: [],
+    deleteConfirmCoords: {},
+    isDeleteConfirmVisible: false,
   },
   getters: {
     productsOnPage: state => {
@@ -28,6 +42,30 @@ export default new Vuex.Store({
               correction,
               Number(state.productsPerPage) + correction
           )
+    },
+    filteredAndSortedProductProps: state => {
+      return state.productProps
+          .filter(p => !state.excludedProductProps.includes(p.name))
+          // made active prop first by sorting
+          // (if second prop active then swap otherwise don't touch)
+          .sort(second => second.name === state.activeProductProp ? -1 : 0)
+    },
+    isAllProductPropsExcluded: state => {
+      return state.productProps.length === state.excludedProductProps.length
+    },
+    isAllProductPropsSelected: state => {
+      return !state.excludedProductProps.length
+    },
+    productsStartFrom: state => {
+      return state.currentPage * state.productsPerPage + 1
+    },
+    productsEndTo: state => {
+      const productsAmount = state.products.length
+      const possibleValue = (state.currentPage  + 1) * state.productsPerPage
+
+      return (productsAmount > possibleValue)
+          ? possibleValue
+          : productsAmount
     }
   },
   mutations: mutations,
