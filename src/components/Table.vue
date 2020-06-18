@@ -1,7 +1,7 @@
 <template>
     <table>
         <thead>
-            <tr @click="$emit('change-sort-order', $event)">
+            <tr @click="onToggleSortOrder($event)">
                 <th><input type="checkbox" hidden></th>
                 <th
                         v-for="productProp in filteredAndSortedProductProps"
@@ -16,9 +16,9 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody @click.prevent="$emit('on-t-body-row-click', $event)">
+        <tbody @click.prevent="onTBodyRowClick($event)">
             <tr
-                v-for="product in filteredProducts"
+                v-for="product in productsOnPage"
                 :key="product.id"
                 :data-id="product.id"
                 class="tbody-row"
@@ -26,7 +26,7 @@
                 <td>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" :checked="idProductsForDelete.includes(product.id)">
+                            <input type="checkbox" :checked="idsProductsForDelete.includes(product.id)">
                             <span class="checkmark"></span>
                         </label>
                     </div>
@@ -51,26 +51,56 @@
 </template>
 
 <script>
+    import {mapActions, mapGetters, mapState} from "vuex"
+
     export default {
-        props: {
-            activeProductProp: {
-                type: String
-            },
-            sortOrder: String,
-            filteredProducts: {
-                type: Array,
-                required: true
-            },
-            filteredAndSortedProductProps: {
-                type: Array
-            },
-            idProductsForDelete: {
-                type: Array
-            }
+        computed: {
+            ...mapState([
+                'activeProductProp',
+                'sortOrder',
+                'idsProductsForDelete',
+            ]),
+            ...mapGetters([
+                'productsOnPage',
+                'filteredAndSortedProductProps'
+            ]),
         },
         methods: {
+            ...mapActions([
+                'toggleSortOrder',
+                'prepareToRemoveOneProduct',
+                'toggleIdsProductsForDelete',
+            ]),
 
-        }
+            onToggleSortOrder(e) {
+                const target = e.target.closest('.active')
+                if (!target) return
+
+                this.toggleSortOrder()
+            },
+
+            onTBodyRowClick(e) {
+                const btn = e.target.closest('.delete-one')
+                const tr = e.target.closest('.tbody-row')
+
+                if (!btn && !tr) return
+                const productId = Number(tr.dataset.id)
+                const coordFromTop = tr.getBoundingClientRect().bottom + window.pageYOffset - 180
+
+                if (btn) {
+                    this.prepareToRemoveOneProduct({
+                        productId,
+                        coordFromTop
+                    })
+                } else {
+                    this.toggleIdsProductsForDelete({
+                        productId,
+                        coordFromTop
+                    })
+                }
+            },
+
+        },
     }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <div class="filters">
-        <div class="sorting-btns" @click="$emit('choose-first-column', $event)">
+        <div class="sorting-btns" @click="onChooseFirstColumn($event)">
             <span class="text">Sorting by:</span>
             <button
                     v-for="productProp in productProps"
@@ -14,20 +14,20 @@
         </div>
 
         <div class="other-elements">
-            <button :class="['delete', idProductsForDelete.length && !isDeleteConfirmVisible && 'active']"
-                    :disabled="!idProductsForDelete.length || isDeleteConfirmVisible"
-                    @click="$emit('show-delete-confirm')"
+            <button :class="['delete', idsProductsForDelete.length && !isDeleteConfirmVisible && 'active']"
+                    :disabled="!idsProductsForDelete.length || isDeleteConfirmVisible"
+                    @click="showDeleteConfirm()"
             >
-                Delete {{idProductsForDelete.length > 1 && !isDeleteConfirmVisible
-                            ? `(${idProductsForDelete.length})`
+                Delete {{idsProductsForDelete.length > 1 && !isDeleteConfirmVisible
+                            ? `(${idsProductsForDelete.length})`
                             : null
                 }}
             </button>
             <select
                     name="per-page"
                     id="per-page"
-                    :value="selectedProductsPerPage"
-                    @input="$emit('on-change-selected-products-per-page', $event.target.value)"
+                    :value="productsPerPage"
+                    @input="changeProductsPerPage($event.target.value)"
             >
                 <option value="10">10 Per Page</option>
                 <option value="15">15 Per Page</option>
@@ -36,18 +36,18 @@
             <button
                     class="nav-arrow left-arrow"
                     :disabled="productsStartFrom === 1"
-                    @click="$emit('change-current-page', 'back')"
+                    @click="changeCurrentPage('back')"
             />
             <span>{{productsStartFrom}}-{{productsEndTo}} of {{productsAmount}}</span>
             <button
                     class="nav-arrow right-arrow"
                     :disabled="productsEndTo === productsAmount"
-                    @click="$emit('change-current-page', 'forward')"
+                    @click="changeCurrentPage('forward')"
             />
             <div class="choose-columns-wrap">
                 <button
                         class="choose-columns"
-                        @click="$emit('toggle-select-expanded-visible')"
+                        @click="onToggleSelectExpandedVisible()"
                 >
                     6 columns selected
                 </button>
@@ -59,7 +59,7 @@
                                 <input
                                         type="checkbox"
                                         :checked="isAllProductPropsSelected"
-                                        @change="$emit('toggle-all-product-props-selected')"
+                                        @change="onToggleAllProductPropsSelected()"
                                 >
                                 <span class="checkmark"></span>
                                 Select All
@@ -74,7 +74,7 @@
                                 <input type="checkbox"
                                        :checked="!excludedProductProps.includes(productProp.name)"
                                        :value="productProp.name"
-                                       @change="$emit('toggle-exclude-product-props' , $event)"
+                                       @change="onToggleExcludedProductProp($event)"
                                 >
                                 <span class="checkmark"></span>
                                 {{productProp.name}}
@@ -92,13 +92,13 @@
                             :style="deleteConfirmCoords"
                     >
                         <p class="question">
-                            Are you sure you want to delete item{{idProductsForDelete.length > 1 ? 's' : ''}}?
+                            Are you sure you want to delete item{{idsProductsForDelete.length > 1 ? 's' : ''}}?
                         </p>
                         <div class="delete-confirm-btns">
-                            <button class="cancel" @click="$emit('hide-delete-confirm')">
+                            <button class="cancel" @click="hideDeleteConfirm()">
                                 Cancel
                             </button>
-                            <button class="confirm active" @click="$emit('remove-products-by-id')">
+                            <button class="confirm active" @click="removeProductsById()">
                                 Confirm
                             </button>
                         </div>
@@ -115,53 +115,65 @@
 </template>
 
 <script>
+    import {mapActions, mapGetters, mapState} from "vuex"
+
     export default {
-        props: {
-            productProps: {
-              type: Array,
-              required: true
-            },
-            activeProductProp: {
-                type: String
-            },
-            selectedProductsPerPage: {
-                type: String,
-                required: true
-            },
-            productsAmount: {
-                type: Number
-            },
-            productsStartFrom: {
-                type: Number
-            },
-            productsEndTo: {
-                type: Number
-            },
-            isSelectExpandedVisible: {
-                type: Boolean
-            },
-            excludedProductProps: {
-                type: Array
-            },
-            isAllProductPropsSelected: {
-                type: Boolean
-            },
-
-
-
-            isDeleteConfirmVisible: {
-                type: Boolean
-            },
-            deleteConfirmCoords: {
-                type: Object
-            },
-            idProductsForDelete: {
-                type: Array
-            }
+        computed: {
+            ...mapState([
+                'activeProductProp',
+                'productsPerPage',
+                // currentPage??
+                'currentPage',
+                'productProps',
+                'excludedProductProps',
+                'isSelectExpandedVisible',
+                'idsProductsForDelete',
+                'deleteConfirmCoords',
+                'isDeleteConfirmVisible'
+            ]),
+            ...mapGetters([
+                'productsAmount',
+                'productsStartFrom',
+                'productsEndTo',
+                'isAllProductPropsSelected',
+            ]),
         },
         methods: {
+            ...mapActions([
+                'changeProductsPerPage',
+                'changeCurrentPage',
+                'chooseFirstColumn',
+                'toggleExcludedProductProp',
+                'toggleAllProductPropsSelected',
+                'toggleSelectExpandedVisible',
+                'showDeleteConfirm',
+                'hideDeleteConfirm',
+                'removeProductsById'
+            ]),
+            onChooseFirstColumn(e) {
+                const target = e.target.closest('button')
+                if (!target) return
 
-        }
+                this.chooseFirstColumn(target.dataset.propName)
+            },
+
+            // change checkboxes with product props
+            onToggleExcludedProductProp(e) {
+                if (!e.target.closest('input')) return
+                const propName = e.target.value
+
+                this.toggleExcludedProductProp(propName)
+            },
+            //end change checkboxes with product props
+
+            onToggleAllProductPropsSelected() {
+                this.toggleAllProductPropsSelected()
+            },
+
+            onToggleSelectExpandedVisible() {
+                this.toggleSelectExpandedVisible()
+            },
+        },
     }
 </script>
 

@@ -6,46 +6,11 @@
             <Error v-else-if="isError"/>
             <template v-else>
                 <FiltersBar
-                        :product-props="productProps"
-                        @choose-first-column="onChooseFirstColumn"
-                        :active-product-prop="activeProductProp"
 
-                        :selected-products-per-page="productsPerPage"
-                        @on-change-selected-products-per-page="changeProductsPerPage"
-
-                        :products-amount="products.length"
-                        :products-start-from="productsStartFrom"
-                        :products-end-to="productsEndTo"
-
-                        @change-current-page="changeCurrentPage"
-
-                        :is-select-expanded-visible="isSelectExpandedVisible"
-                        @toggle-select-expanded-visible="onToggleSelectExpandedVisible"
-                        :excluded-product-props="excludedProductProps"
-                        :is-all-product-props-selected="isAllProductPropsSelected"
-                        @toggle-all-product-props-selected="onToggleAllProductPropsSelected"
-                        @toggle-exclude-product-props="onToggleExcludedProductProp"
-
-
-                        :is-delete-confirm-visible="isDeleteConfirmVisible"
-                        :delete-confirm-coords="deleteConfirmCoords"
-                        @hide-delete-confirm="hideDeleteConfirm"
-                        @remove-products-by-id="removeProductsById"
-                        :id-products-for-delete="idsProductsForDelete"
-                        @show-delete-confirm="showDeleteConfirm"
                 />
                 <p v-if="isAllProductPropsExcluded" class="no-table">You should on at least one product prop</p>
-<!--                Поправить ошибку при выключении сразу всех props-ов-->
                 <Table  v-else
-                        @change-sort-order="onToggleSortOrder"
-                        :sort-order="sortOrder"
-                        :active-product-prop="activeProductProp"
-                        :filtered-products="productsOnPage"
 
-                        :id-products-for-delete="idsProductsForDelete"
-
-                        :filtered-and-sorted-product-props="filteredAndSortedProductProps"
-                        @on-t-body-row-click="onTBodyRowClick"
                 />
             </template>
         </div>
@@ -67,114 +32,20 @@
             Error,
             Loader
         },
-        data() {
-            return {
-
-            }
-        },
         computed: {
             ...mapState([
-                'products',
                 'isError',
                 'isLoading',
-                'activeProductProp',
-                'productsPerPage',
-                'currentPage',
-                'sortOrder',
-                'productProps',
-                'excludedProductProps',
-                'isSelectExpandedVisible',
-                'idsProductsForDelete',
-                'deleteConfirmCoords',
-                'isDeleteConfirmVisible'
             ]),
             ...mapGetters([
-                'productsOnPage',
-                'productsStartFrom',
-                'productsEndTo',
                 'isAllProductPropsExcluded',
-                'isAllProductPropsSelected',
-                'filteredAndSortedProductProps'
             ]),
         },
         methods: {
             ...mapActions([
                 'getProductsFromApi',
-                'changeProductsPerPage',
-                'changeCurrentPage',
-                'toggleSortOrder',
-                'chooseFirstColumn',
-                'toggleExcludedProductProp',
-                'toggleAllProductPropsSelected',
-                'toggleSelectExpandedVisible',
-                'prepareToRemoveOneProduct',
-                'toggleIdsProductsForDelete',
-                'showDeleteConfirm',
-                'hideDeleteConfirm',
-                'removeProductsById'
             ]),
-            onChooseFirstColumn(e) {
-                const target = e.target.closest('button')
-                if (!target) return
-
-                this.chooseFirstColumn(target.dataset.propName)
-            },
-
-            // change checkboxes with product props
-            onToggleExcludedProductProp(e) {
-                if (!e.target.closest('input')) return
-                const propName = e.target.value
-
-                this.toggleExcludedProductProp(propName)
-            },
-            //end change checkboxes with product props
-
-            onToggleAllProductPropsSelected() {
-                this.toggleAllProductPropsSelected()
-            },
-
-            onToggleSortOrder(e) {
-                const target = e.target.closest('.active')
-                if (!target) return
-
-                this.toggleSortOrder()
-            },
-
-            onToggleSelectExpandedVisible() {
-                this.toggleSelectExpandedVisible()
-            },
-
-
-
-
-            onTBodyRowClick(e) {
-                const btn = e.target.closest('.delete-one')
-                const tr = e.target.closest('.tbody-row')
-
-                if (!btn && !tr) return
-                const productId = Number(tr.dataset.id)
-                const coordFromTop = tr.getBoundingClientRect().bottom + window.pageYOffset - 180
-
-                if (btn) {
-                    this.prepareToRemoveOneProduct({
-                        productId,
-                        coordFromTop
-                    })
-                } else {
-                    this.toggleIdsProductsForDelete({
-                        productId,
-                        coordFromTop
-                    })
-                }
-            },
-
         },
-
-        // watch: {
-        //     selectedProductsPerPage() {
-        //         console.log(this.selectedProductsPerPage)
-        //     }
-        // },
         created() {
             this.getProductsFromApi()
         }

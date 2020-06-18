@@ -1,4 +1,4 @@
-import {getProducts} from "../../api/request"
+import {deleteProducts, getProducts} from "../../api/request"
 import {
     SAVE_PRODUCTS,
     FINISH_LOADING,
@@ -17,6 +17,7 @@ import {
     HIDE_DELETE_CONFIRM
 } from '../mutations/mutation-types'
 
+let isDeletionInProgress = false
 
 export default {
     getProductsFromApi(context) {
@@ -137,11 +138,23 @@ export default {
     },
 
     removeProductsById({commit, state}) {
-        const newProducts = state.products.filter(
-            product => !state.idsProductsForDelete.includes(product.id)
-        )
-        commit(SAVE_PRODUCTS, newProducts)
-        commit(HIDE_DELETE_CONFIRM)
+        if (isDeletionInProgress) return
+        isDeletionInProgress = true
+        deleteProducts()
+            .then(({message}) => {
+                const newProducts = state.products.filter(
+                    product => !state.idsProductsForDelete.includes(product.id)
+                )
+                commit(SAVE_PRODUCTS, newProducts)
+                alert(message)
+            })
+            .catch(({error}) => {
+                alert(`${error}. Try again.`)
+            })
+            .finally(() => {
+                isDeletionInProgress = false
+                commit(HIDE_DELETE_CONFIRM)
+            })
     }
 
 }

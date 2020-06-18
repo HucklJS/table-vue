@@ -30,6 +30,9 @@ export default new Vuex.Store({
     isDeleteConfirmVisible: false,
   },
   getters: {
+    productsAmount: state => {
+      return state.products.length
+    },
     productsOnPage: state => {
       const correction = state.currentPage * state.productsPerPage
       return [...state.products]
