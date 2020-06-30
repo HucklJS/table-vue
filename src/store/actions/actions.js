@@ -35,6 +35,7 @@ export default {
 
     // select product per page
     changeProductsPerPage(context, value) {
+        console.log('changeProductsPerPage')
         context.commit(SET_PRODUCTS_PER_PAGE, value)
         context.commit(CHANGE_CURRENT_PAGE, 'reset')
     },

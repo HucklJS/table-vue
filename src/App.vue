@@ -5,13 +5,9 @@
             <Loader v-if="isLoading"/>
             <Error v-else-if="isError"/>
             <template v-else>
-                <FiltersBar
-
-                />
+                <FiltersBar/>
                 <p v-if="isAllProductPropsExcluded" class="no-table">You should on at least one product prop</p>
-                <Table  v-else
-
-                />
+                <Table v-else/>
             </template>
         </div>
     </div>
@@ -90,7 +86,8 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: #2c3e50;
-        margin-top: 60px;
+        padding-top: 60px;
+        padding-bottom: 100px;
     }
 
     .container {
